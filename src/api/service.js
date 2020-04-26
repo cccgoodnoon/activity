@@ -90,8 +90,8 @@ export default {
         return oGet('http://127.0.0.1:5000/api/u/course');
     },
 
-    _getA (param) {
-        return oGet('http://127.0.0.1:5000/api/u/activity/'+ param);
+    _getA (id) {
+        return oGet('http://127.0.0.1:5000/api/u/activity/'+ id);
     },
     
     _post (params) {
@@ -103,11 +103,10 @@ export default {
     // },
 
     // //删除单个用户
-    // _remove(user){
-    //     var userid = user.id;
-    //     return oRemove('http://127.0.0.1:5000/rest/anon/tasks/'+ userid);
+    _remove(name){      
+        return oRemove('http://127.0.0.1:5000/api/u/activity/'+ name);
         
-    // },
+    },
 
     // //批量删除
     // _removes(){
