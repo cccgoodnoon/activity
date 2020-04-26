@@ -7,14 +7,16 @@
                 <ul class="btn-edit fr">
                     <li >
                         <el-date-picker
-                            v-model="value"
+                            v-model="timeValue"
                             align="right"
                             type="date"
-                            placeholder="选择日期"
+                            placeholder="选择日期时间"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd"
                             :picker-options="pickerOptions">
                         </el-date-picker>  
-                        <el-button type="primary" @click="dialogCreateVisible = true"> <i class="el-icon-plus iconss" ></i>新增</el-button>
-                        <el-button type="danger" icon="delete" :disabled="selected.length==0" @click="removeUsers()">移除</el-button>
+                        <el-button type="primary" @click="addActivity()"> <i class="el-icon-plus iconss" ></i>新增</el-button>
+                        <el-button type="danger" icon="delete" :disabled="selected.length==0" @click="removeActivity()">移除</el-button>
                     </li>
                 </ul>                
             </div>
@@ -52,9 +54,9 @@
                         <span id="teacher"></span><span>老师上课清单</span>
                         <el-table  height="650" :data="activity" row-class-name="rowBg">
                             <el-table-column type="selection" width="55"></el-table-column>
-                            <el-table-column prop="vesselNameCn" label="ID" width="80"></el-table-column>
-                            <el-table-column prop="mmsi" label="MMSI"></el-table-column>
-                            <el-table-column prop="equipmentCode" label="设备编码"></el-table-column>
+                            <el-table-column prop="id" label="ID" width="65"></el-table-column>
+                            <el-table-column prop="code" label="课程代号" width="95"></el-table-column>
+                            <el-table-column prop="name" label="课程名称"></el-table-column>
                         </el-table>
                     </div>
                 </el-col>
@@ -78,28 +80,29 @@
     import api from '../api/service.js'
     export default {
         name:'',
-        data : function () {
+        data() {
             return{
                 member:[],
                 course:[],
                 activity:[],
                 checked: null,
-                value: '',
-                filter: {
-                    per_page: 10, // 页大小
-                    page: 1, // 当前页
-                    id: '',
-                    description: '',
-                    endtime: '',
-                    performer: '',
-                    state: '',
-                    title: '',
-                    sorts: '',
-                },
+                timeValue: '',
+                course_uuid:'',
+                course_credit:'',
+                member_uuid:'',
+                // filter: {
+                //     per_page: 10, // 页大小
+                //     page: 1, // 当前页
+                //     id: '',
+                //     description: '',
+                //     endtime: '',
+                //     performer: '',
+                //     state: '',
+                //     title: '',
+                //     sorts: '',
+                // },
                 // total_rows:0,
                 selected: [], //已选择项
-                dialogCreateVisible: false, //创建对话框的显示状态
-                dialogUpdateVisible: false, //编辑对话框的显示状态
                 pickerOptions: {
                     disabledDate(time) {
                         return time.getTime() > Date.now();
@@ -141,43 +144,40 @@
                     let array=val.pop();
                     this.$refs.memberTable.toggleRowSelection(array,true);
                     this.selected=array;
-                    // console.log(array);
                     document.getElementById("teacher").innerHTML=array.firstname; 
                 } 
                 if (val.length == 1) {
                     this.$refs.memberTable.toggleRowSelection(val,false);
                     this.selected=val;
-                    console.log(val);
                     document.getElementById("teacher").innerHTML=val.firstname;
                 } 
-            },     
-            // tableSelectionChange(val) {
-            //     this.selected=val;        
-            // },             
+            },             
             handleMember(row, event, column) {
-                console.log(row, event, column)
                 console.log(row.firstname);
                 this.$refs.memberTable.toggleRowSelection(row);
                 document.getElementById("teacher").innerHTML=row.firstname; 
+                api._getM().then(res => {
+                    this.member_uuid = res[row.id-1].uuid;
+                    // console.log(res[row.id-1]);
+                    console.log(this.member_uuid);
+                })
+                this.getActivity();             
             },
             handleCourse(row, event, column) {
-                console.log(row, event, column)
-                this.$refs.courseTable.toggleRowSelection(row).then(res => {
-                    api._getC().then(res => {
-                        console.log(row.id);
-                        var course_uuid = res[row.id].uuid;
-                    })
+                this.$refs.courseTable.toggleRowSelection(row)
+                api._getC().then(res => {
+                    this.course_uuid = res[row.id-3].uuid;
+                    this.course_credit = res[row.id-3].credit;
+                    console.log(res[row.id-3]);
+                    console.log(this.course_uuid);
+                    console.log(this.course_credit);
                 })
-                console.log("234");
             },
             //获取任务数据
             getMember(){
                 let self = this
                 api._getM().then(res => {
                     self.member = res;
-                    // console.log(res.data);
-                    // this.total_rows = res.datas.total_rows;
-                    // console.log(res,8888);
                 },err => {
                     console.log(err);
                 })
@@ -186,94 +186,112 @@
                 let self = this
                 api._getC().then(res => {
                     self.course = res;
-                    console.log(res);
-                    // this.total_rows = res.datas.total_rows;
-                    // console.log(res,8888);
                 },err => {
                     console.log(err);
                 })
             },
-            //创建任务
-            createUser() {
-                this.$refs.create.validate((valid) => {
-                    if (valid) {
-                        api._post(this.create).then(res => {
-                            this.$message.success('创建任务成功！');
-                            this.dialogCreateVisible = false;
-                            this.createLoading = false;
-                            this.reset();
-                            this.getUsers();
-                        }).catch((res) => {
-                            var data = res;
-                            if (data instanceof Array) {
-                              this.$message.error(data[0]["message"]);
-                            } else if (data instanceof Object) {
-                              this.$message.error(data["message"]);
-                            }
-                            this.createLoading = false;
-                        });
-                    } else {
-                      //this.$message.error('存在输入校验错误!');
-                      return false;
-                    }
-                });
+            getActivity(){
+                api._getA(this.member_uuid).then(res =>{
+                    this.addActivity.code = res
+                })
+                //显示该老师的课程
             },
+            addActivity(){
+                api._post({course_uuid:this.course_uuid,course_credit:this.course_credit,member_uuid:this.member_uuid,timeValue:this.timeValue}).then(res =>{
+                    this.$message.success('成功为该老师添加一门课！');
+                },err => {
+                    console.log(err);
+                })
+                console.log(this.course_uuid);
+                console.log(this.course_credit);
+                console.log(this.member_uuid);
+                console.log(this.timeValue);
+                                
+            },
+            removeActivity(){
+
+            }
+            //创建任务
+            // createUser() {
+            //     this.$refs.create.validate((valid) => {
+            //         if (valid) {
+            //             api._post(this.create).then(res => {
+            //                 this.$message.success('创建任务成功！');
+            //                 this.dialogCreateVisible = false;
+            //                 this.createLoading = false;
+            //                 this.reset();
+            //                 this.getUsers();
+            //             }).catch((res) => {
+            //                 var data = res;
+            //                 if (data instanceof Array) {
+            //                   this.$message.error(data[0]["message"]);
+            //                 } else if (data instanceof Object) {
+            //                   this.$message.error(data["message"]);
+            //                 }
+            //                 this.createLoading = false;
+            //             });
+            //         } else {
+            //           //this.$message.error('存在输入校验错误!');
+            //           return false;
+            //         }
+            //     });
+            // },
             
             // 更新任务
-            updateUser() {
-                this.$refs.update.validate((valid) => {
-                    if (valid) {
-                        api._update(this.currentId, this.update).then(res => {
-                            this.$message.success('修改任务成功！');
-                            this.dialogUpdateVisible = false;
-                            this.getUsers();
-                        }).catch((res) => {
-                            var data = res;
-                            if (data instanceof Array) {
-                                this.$message.error(data[0]["message"]);
-                            } else if (data instanceof Object) {
-                                this.$message.error(data["message"]);
-                            }
-                            this.updateLoading = false;
-                          });
-                    } else {
-                        return false;
-                    }
-                });
-            },
+            // updateUser() {
+            //     this.$refs.update.validate((valid) => {
+            //         if (valid) {
+            //             api._update(this.currentId, this.update).then(res => {
+            //                 this.$message.success('修改任务成功！');
+            //                 this.dialogUpdateVisible = false;
+            //                 this.getUsers();
+            //             }).catch((res) => {
+            //                 var data = res;
+            //                 if (data instanceof Array) {
+            //                     this.$message.error(data[0]["message"]);
+            //                 } else if (data instanceof Object) {
+            //                     this.$message.error(data["message"]);
+            //                 }
+            //                 this.updateLoading = false;
+            //               });
+            //         } else {
+            //             return false;
+            //         }
+            //     });
+            // },
 
             // 删除单个任务
-            removeUser(user) {
-                this.$confirm('是否要删除任务 ' + user.title + ' ?', '提示', {
-                  type: 'warning'
-                }).then(() => {
-                    api._remove(user).then(res => {
-                        this.$message.success('成功删除了任务' + user.title + ' !');
-                        this.getUsers();
-                        console.log(user.id);
-                    }).catch((res) => {
-                        this.$message.error('删除失败!');
-                    });
-                }).catch(() => {
-                    this.$message.info('已取消操作!');
-                });
-            },
+            // removeUser(user) {
+            //     this.$confirm('是否要删除任务 ' + user.title + ' ?', '提示', {
+            //       type: 'warning'
+            //     }).then(() => {
+            //         api._remove(user).then(res => {
+            //             this.$message.success('成功删除了任务' + user.title + ' !');
+            //             this.getUsers();
+            //             console.log(user.id);
+            //         }).catch((res) => {
+            //             this.$message.error('删除失败!');
+            //         });
+            //     }).catch(() => {
+            //         this.$message.info('已取消操作!');
+            //     });
+            // },
 
              //删除多个任务
-            removeUsers() {
-                this.$confirm('此操作将永久删除 ' + this.selected.length + ' 个任务, 是否继续?', '提示', {
-                    type: 'warning'
-                }).then(() => {
-                    api._removes().then(res =>{
-                        this.$message.success('删除了' + this.selected.length + '个任务!');
-                        this.getUsers();
-                    }).catch((res) => {
-                        this.$message.error('删除失败!');
-                    });
-                }).catch(() => {
-                    this.$message('已取消操作!');
-                });
-            }
+            // removeUsers() {
+            //     this.$confirm('此操作将永久删除 ' + this.selected.length + ' 个任务, 是否继续?', '提示', {
+            //         type: 'warning'
+            //     }).then(() => {
+            //         api._removes().then(res =>{
+            //             this.$message.success('删除了' + this.selected.length + '个任务!');
+            //             this.getUsers();
+            //         }).catch((res) => {
+            //             this.$message.error('删除失败!');
+            //         });
+            //     }).catch(() => {
+            //         this.$message('已取消操作!');
+            //     });
+            // }
         }
     }
 </script>

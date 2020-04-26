@@ -89,30 +89,34 @@ export default {
     _getC () {
         return oGet('http://127.0.0.1:5000/api/u/course');
     },
+
+    _getA (param) {
+        return oGet('http://127.0.0.1:5000/api/u/activity/'+ param);
+    },
     
     _post (params) {
-        return oPost('http://127.0.0.1:5000/rest/anon/tasks',params);
+        return oPost('http://127.0.0.1:5000/api/u/activity',params);
     },
     
-    _update (id, param) {
-        return oUpdate('http://127.0.0.1:5000/rest/anon/tasks/'+ id, param);
-    },
+    // _update (id, param) {
+    //     return oUpdate('http://127.0.0.1:5000/rest/anon/tasks/'+ id, param);
+    // },
 
-    //删除单个用户
-    _remove(user){
-        var userid = user.id;
-        return oRemove('http://127.0.0.1:5000/rest/anon/tasks/'+ userid);
+    // //删除单个用户
+    // _remove(user){
+    //     var userid = user.id;
+    //     return oRemove('http://127.0.0.1:5000/rest/anon/tasks/'+ userid);
         
-    },
+    // },
 
-    //批量删除
-    _removes(){
-        var ids = [];
-        $.each(this.selected, (i, user) => {
-            ids.push(user.id);
-        });
-        ids = ids.join(",");
-        return oRemove('http://127.0.0.1:5000/rest/anon/tasks/'+ids);
-    },
+    // //批量删除
+    // _removes(){
+    //     var ids = [];
+    //     $.each(this.selected, (i, user) => {
+    //         ids.push(user.id);
+    //     });
+    //     ids = ids.join(",");
+    //     return oRemove('http://127.0.0.1:5000/rest/anon/tasks/'+ids);
+    // },
 }
 
