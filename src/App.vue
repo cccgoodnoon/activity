@@ -1,15 +1,15 @@
 <template>
     <div id="app">
-        <index></index>
+        <User></User>
     </div>
 </template>
 
 <script>
-import index from './components/index'
+import User from './components/user'
 export default {
     name: 'app',
     components : {
-        index
+        User
     }
 }
 </script>

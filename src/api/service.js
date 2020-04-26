@@ -83,19 +83,19 @@ export const oRemove = (url , params) => {
 export default { 
 
     _getM () {
-        return oGet('http://127.0.0.1:5000/api/u/member');
+        return oGet('http://47.111.234.116:8080/api/u/member');
     },
 
     _getC () {
-        return oGet('http://127.0.0.1:5000/api/u/course');
+        return oGet('http://47.111.234.116:8080/api/u/course');
     },
 
     _getA (id) {
-        return oGet('http://127.0.0.1:5000/api/u/activity/'+ id);
+        return oGet('http://47.111.234.116:8080/api/u/activity/'+ id);
     },
     
     _post (params) {
-        return oPost('http://127.0.0.1:5000/api/u/activity',params);
+        return oPost('http://47.111.234.116:8080/api/u/activity',params);
     },
     
     // _update (id, param) {
@@ -104,7 +104,7 @@ export default {
 
     // //删除单个用户
     _remove(name){      
-        return oRemove('http://127.0.0.1:5000/api/u/activity/'+ name);
+        return oRemove('http://47.111.234.116:8080/api/u/activity/'+ name);
         
     },
 

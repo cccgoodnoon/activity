@@ -1,6 +1,6 @@
 <template>
     <!-- <el-container> -->
-        <div id="index"> 
+        <div id="user"> 
             <h1>教学任务分配</h1>
             <!-- <el-divider></el-divider> -->
             <div>            
@@ -91,9 +91,6 @@
                 actiSelected: [], 
                 name:'',
                 pickerOptions: {
-                    disabledDate(time) {
-                        return time.getTime() > Date.now();
-                    },
                     shortcuts: [{
                         text: '今天',
                         onClick(picker) {
@@ -246,7 +243,7 @@
     padding: 5px;
     display:block;
 }
-.righttable{margin-top: 20px;}
+.righttable{margin-top: 30px;}
 ul li{list-style: none}
 .tc{text-align:center; }
 .mg{ margin-top:1px;}
