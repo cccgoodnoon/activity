@@ -99,12 +99,12 @@ export default {
     },
     
     // _update (id, param) {
-    //     return oUpdate('http://127.0.0.1:5000/rest/anon/tasks/'+ id, param);
+    //     return oUpdate('http://47.111.234.116:8080/rest/anon/tasks/'+ id, param);
     // },
 
     // //删除单个用户
-    _remove(name){      
-        return oRemove('http://47.111.234.116:8080/api/u/activity/'+ name);
+    _remove(coursename,memberid){      
+        return oRemove('http://47.111.234.116:8080/api/u/activity/'+ coursename+'/'+memberid);
         
     },
 

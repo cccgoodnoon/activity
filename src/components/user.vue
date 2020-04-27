@@ -39,7 +39,7 @@
                 <!--中间表格-->
                     <div>
                         <span class="subtitle">课程清单</span>
-                        <el-table  height="650" :data="course" ref="courseTable" @row-click="handleCourse" highlight-current-row>
+                        <el-table  height="650" :data="course" ref="courseTable" @row-click="handleCourse" @selection-change="courseTableSelection" highlight-current-row>
                             <el-table-column type="selection" width="50"></el-table-column>
                             <el-table-column prop="id" label="ID" width="65"></el-table-column>
                             <el-table-column prop="code" label="课程代号" width="95"></el-table-column>
@@ -88,8 +88,9 @@
                 course_credit:'',
                 member_uuid:'',
                 selected: [],
+                courseSelected: [],
                 actiSelected: [], 
-                name:'',
+                course_name:'',
                 pickerOptions: {
                     shortcuts: [{
                         text: '今天',
@@ -126,8 +127,15 @@
                 if (val.length == 1) {
                     this.$refs.activityTable.toggleRowSelection(val,false);
                     this.actiSelected=val;
-                    this.name = val[0].name;
-                } 
+                    this.course_name = val[0].name;
+                }
+                if (val.length > 1) {
+                    this.$refs.activityTable.clearSelection();
+                    let array=val.pop();
+                    this.$refs.activityTable.toggleRowSelection(array,true);
+                    this.actiSelected=array;
+                    // document.getElementById("teacher").innerHTML=array.firstname; 
+                }  
             },
             memberTableSelection(val) {
                 if (val.length > 1) {
@@ -140,6 +148,20 @@
                 if (val.length == 1) {
                     this.$refs.memberTable.toggleRowSelection(val,false);
                     this.selected=val;
+                    // document.getElementById("teacher").innerHTML=val.firstname;
+                } 
+            },
+            courseTableSelection(val) {
+                if (val.length > 1) {
+                    this.$refs.courseTable.clearSelection();
+                    let array=val.pop();
+                    this.$refs.courseTable.toggleRowSelection(array,true);
+                    this.courseSelected=array;
+                    // document.getElementById("teacher").innerHTML=array.firstname; 
+                } 
+                if (val.length == 1) {
+                    this.$refs.memberTable.toggleRowSelection(val,false);
+                    this.courseSelected=val;
                     // document.getElementById("teacher").innerHTML=val.firstname;
                 } 
             },             
@@ -213,11 +235,12 @@
                 console.log(this.timeValue);                               
             },
             removeActivity(){
-                console.log(this.name);
+                console.log(this.course_name);
+                console.log(this.member_uuid);
                 this.$confirm('此操作将删除该老师的 ' + this.actiSelected.length + ' 门课程, 是否继续?','提示', {
                   type: 'warning'
                 }).then(() => {
-                    api._remove(this.name).then(res => {
+                    api._remove(this.course_name,this.member_uuid).then(res => {
                         this.$message.success('成功删除了课程!');
                         // this.getMember();
                         // this.getCourse();
