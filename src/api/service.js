@@ -81,7 +81,8 @@ export const oRemove = (url , params) => {
 }
 
 export default { 
-
+// 127.0.0.1:5000
+// 47.111.234.116:8080
     _getM () {
         return oGet('http://47.111.234.116:8080/api/u/member');
     },
@@ -90,6 +91,9 @@ export default {
         return oGet('http://47.111.234.116:8080/api/u/course');
     },
 
+    _getOC (id) {
+        return oGet('http://47.111.234.116:8080/api/u/course/'+ id);
+    },
     _getA (id) {
         return oGet('http://47.111.234.116:8080/api/u/activity/'+ id);
     },
@@ -98,11 +102,10 @@ export default {
         return oPost('http://47.111.234.116:8080/api/u/activity',params);
     },
     
-    // _update (id, param) {
-    //     return oUpdate('http://47.111.234.116:8080/rest/anon/tasks/'+ id, param);
-    // },
+    _update (id, param) {
+        return oUpdate('http://47.111.234.116:8080/api/u/activity/state/'+ id, param);
+    },
 
-    // //删除单个用户
     _remove(coursename,memberid){      
         return oRemove('http://47.111.234.116:8080/api/u/activity/'+ coursename+'/'+memberid);
         
@@ -115,7 +118,7 @@ export default {
     //         ids.push(user.id);
     //     });
     //     ids = ids.join(",");
-    //     return oRemove('http://127.0.0.1:5000/rest/anon/tasks/'+ids);
+    //     return oRemove('http://47.111.234.116:8080/rest/anon/tasks/'+ids);
     // },
 }
 
