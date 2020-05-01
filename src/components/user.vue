@@ -36,7 +36,7 @@
                     <div>
                         <span class="subtitle">教师名单</span>
                         <el-table :data="member.filter(data => !msearch || data.firstname.toLowerCase().includes(msearch.toLowerCase()))" 
-                            height="650" ref="memberTable" @row-click="handleMember" @selection-change="memberTableSelection" highlight-current-row 
+                            height="650" ref="memberTable" @row-click="handleMember"  highlight-current-row 
                             :header-cell-style="{background:'#d6e4f0'}"
                             >
                             <!-- <el-table-column type="selection" width="50" align="center"></el-table-column> -->
@@ -69,7 +69,7 @@
                         <span class="subtitle">课程清单</span>
                         <el-table height="650" :data="course.filter(data => !csearch || data.name.toLowerCase().includes(csearch.toLowerCase()))" 
                             ref="courseTable" @row-click="handleCourse" 
-                            @selection-change="courseTableSelection" highlight-current-row 
+                            highlight-current-row 
                             :header-cell-style="{background:'#d6e4f0'}"
                             > 
                             <!-- <el-table-column type="selection" width="50" align="center"></el-table-column> -->
@@ -98,7 +98,7 @@
                         <!-- <div><span id="teacher"></span><span>老师上课清单</span></div> -->
                         <el-table height="650" :data="activity" ref="activityTable" @selection-change="actiTableSelection" highlight-current-row :header-cell-style="{background:'#d6e4f0'}" @row-click="handleActivity">
                             <el-table-column type="selection" width="50"></el-table-column>
-                            <el-table-column prop="id" label="ID" width="40">
+                            <el-table-column prop="uuid" label="ID" width="40">
                                 <template slot-scope="scope">{{scope.$index +1}}</template>
                             </el-table-column>
                             <el-table-column prop="code" label="课程代号" width="80" align="center"></el-table-column>
@@ -222,6 +222,7 @@
                     this.$refs.activityTable.toggleRowSelection(array,true);
                     this.actiSelected=array;
                     console.log(array);
+                    // this.uuid
                     
                     // document.getElementById("teacher").innerHTML=array.firstname; 
                 } 
@@ -229,49 +230,48 @@
                     this.$refs.activityTable.toggleRowSelection(val,false);
                     this.actiSelected=val;
                     this.course_name = val[0].name;
-                    console.log(val[0].name);
-                    
+                    console.log(val);    
                 }
  
             },
-            memberTableSelection(val) {
-                if (val.length > 1) {
-                    this.$refs.memberTable.clearSelection();
-                    let array=val.pop();
-                    this.$refs.memberTable.toggleRowSelection(array,true);
-                    this.selected=array;
-                    // document.getElementById("teacher").innerHTML=array.firstname; 
-                } 
-                if (val.length == 1) {
-                    this.$refs.memberTable.toggleRowSelection(val,false);
-                    this.selected=val;
-                    // document.getElementById("teacher").innerHTML=val.firstname;
-                } 
-            },
-            courseTableSelection(val) {
-                if (val.length > 1) {
-                    this.$refs.courseTable.clearSelection();
-                    let array=val.pop();
-                    this.$refs.courseTable.toggleRowSelection(array,true);
-                    this.courseSelected=array;
-                    // document.getElementById("teacher").innerHTML=array.firstname; 
-                } 
-                if (val.length == 1) {
-                    this.$refs.courseTable.toggleRowSelection(val,false);
-                    this.courseSelected=val;
-                    // document.getElementById("teacher").innerHTML=val.firstname;
-                } 
-            }, 
+            // memberTableSelection(val) {
+            //     if (val.length > 1) {
+            //         this.$refs.memberTable.clearSelection();
+            //         let array=val.pop();
+            //         this.$refs.memberTable.toggleRowSelection(array,true);
+            //         this.selected=array;
+            //         // document.getElementById("teacher").innerHTML=array.firstname; 
+            //     } 
+            //     if (val.length == 1) {
+            //         this.$refs.memberTable.toggleRowSelection(val,false);
+            //         this.selected=val;
+            //         // document.getElementById("teacher").innerHTML=val.firstname;
+            //     } 
+            // },
+            // courseTableSelection(val) {
+            //     if (val.length > 1) {
+            //         this.$refs.courseTable.clearSelection();
+            //         let array=val.pop();
+            //         this.$refs.courseTable.toggleRowSelection(array,true);
+            //         this.courseSelected=array;
+            //         // document.getElementById("teacher").innerHTML=array.firstname; 
+            //     } 
+            //     if (val.length == 1) {
+            //         this.$refs.courseTable.toggleRowSelection(val,false);
+            //         this.courseSelected=val;
+            //         // document.getElementById("teacher").innerHTML=val.firstname;
+            //     } 
+            // }, 
             //点击行            
             handleMember(row, event, column) {
-                console.log("老师名字",row.firstname);
-                console.log("选择框课程状态",this.objectvalue);
+                // console.log("老师名字",row.firstname);
                 this.$refs.memberTable.toggleRowSelection(row);
                 // document.getElementById("teacher").innerHTML=row.firstname;
-                api._getM().then(res => {
-                    console.log(row);
-                    this.member_uuid = res[row.id-1].uuid;
-                    console.log("当前老师uuid",this.member_uuid);
+                api._getOM(row.id).then(res => {
+                    // console.log("这行内容",row);
+                    // console.log("这个老师",res);
+                    this.member_uuid = res[0].uuid;
+                    // console.log("当前老师uuid",this.member_uuid);
                     this.getActivity(this.member_uuid);
                 })
                 this.$refs.memberTable.clearSelection();           
@@ -279,35 +279,31 @@
             handleCourse(row, event, column) {
                 this.$refs.courseTable.toggleRowSelection(row)
                 // this.getOneCourse()
-                console.log(row);
+                // console.log(row);
                 api._getOC(row.id).then(res => {
-                    console.log(row);
+                    // console.log(row);
                     // console.log(this.course.id);
-                    console.log("当前课程id",row.id);
-                    console.log(res);
-                    console.log(res[0]);
+                    // console.log("当前课程id",row.id);
                     this.course_uuid = res[0].uuid;
                     this.course_credit = res[0].credit;
-                    console.log("当前课程uuid",this.course_uuid);
-                    console.log("当前课程学分",this.course_credit);
+                    // console.log("当前课程uuid",this.course_uuid);
+                    // console.log("当前课程学分",this.course_credit);
                 })
             },
             handleActivity(row, event, column) {
-                console.log("当前状态",this.activity[0].objectstate);
-                // this.update.state = this.activity[0].objectstate;
+                // console.log("当前状态",this.activity[0].objectstate);
                 this.update = {'state':this.activity[0].objectstate}
-                console.log(this.update);
-                
+                // console.log(this.update);                
                 this.$refs.activityTable.toggleRowSelection(row)
-                // this.activity.id
-                console.log("行id",row.id);
+                // console.log("行id",row.id);
                 this.currentId = row.id;
-                this.dialogUpdateVisible = true           
+                this.dialogUpdateVisible = true
+                this.update.state = String(this.activity[0].objectstate)           
             },
             getMember(){
                 let self = this
                 api._getM().then(res => {
-                    console.log(res);
+                    // console.log(res);
                     self.member = res;
                 },err => {
                     console.log(err);
@@ -316,14 +312,6 @@
             getCourse(){
                 let self = this
                 api._getC().then(res => {
-                    self.course = res;
-                },err => {
-                    console.log(err);
-                })
-            },
-            getOneCourse(){
-                let self = this
-                api._getOC().then(res => {
                     self.course = res;
                 },err => {
                     console.log(err);
@@ -339,7 +327,7 @@
                 })
             },
             addActivity(){
-                console.log("选择框课程状态",this.objectvalue);
+                // console.log("选择框课程状态",this.objectvalue);
                 if(this.course_uuid != ''&&this.member_uuid != ''&&this.timeValue != ''&&this.objectvalue !=''){
                     api._post({course_uuid:this.course_uuid,course_credit:this.course_credit,member_uuid:this.member_uuid,timeValue:this.timeValue,objectvalue:this.objectvalue}).then(res =>{
                         this.$message.success('成功为该老师添加一门课！');
@@ -359,19 +347,14 @@
                 } else if (this.objectvalue == '') {
                     this.$message.warning('请选择课程状态!');
                 }
-                // if(this.objectvalue == 3){
-                //     api._update(this.objectvalue).then(res => {
-                //         this.getActivity();
-                //     })
-                // }
-                console.log("当前课程uuid",this.course_uuid);
-                console.log("当前课程学分",this.course_credit);
-                console.log("当前老师uuid",this.member_uuid);
-                console.log("选择框时间",this.timeValue);                               
+                // console.log("当前课程uuid",this.course_uuid);
+                // console.log("当前课程学分",this.course_credit);
+                // console.log("当前老师uuid",this.member_uuid);
+                // console.log("选择框时间",this.timeValue);                               
             },
             removeActivity(){
-                console.log(this.course_name);
-                console.log(this.member_uuid);
+                // console.log(this.course_name);
+                // console.log(this.member_uuid);
                 this.$confirm('此操作将删除该老师的 ' + this.actiSelected.length + ' 门课程, 是否继续?','提示', {
                   type: 'warning'
                 }).then(() => {
@@ -388,8 +371,8 @@
                 });
             },
             updateState(){
-                console.log("id",this.currentId);
-                console.log("选择的状态",this.update)
+                // console.log("id",this.currentId);
+                // console.log("选择的状态",this.update)
                 this.$refs.update.validate((valid) => {
                     if (valid) {
                         api._update(this.currentId, this.update).then(res => {

@@ -84,30 +84,32 @@ export default {
 // 127.0.0.1:5000
 // 47.111.234.116:8080
     _getM () {
-        return oGet('http://47.111.234.116:8080/api/u/member');
+        return oGet('http://127.0.0.1:5000/api/u/member');
     },
-
+    _getOM (id) {
+        return oGet('http://127.0.0.1:5000/api/u/member/'+ id);
+    },
     _getC () {
-        return oGet('http://47.111.234.116:8080/api/u/course');
+        return oGet('http://127.0.0.1:5000/api/u/course');
     },
 
     _getOC (id) {
-        return oGet('http://47.111.234.116:8080/api/u/course/'+ id);
+        return oGet('http://127.0.0.1:5000/api/u/course/'+ id);
     },
     _getA (id) {
-        return oGet('http://47.111.234.116:8080/api/u/activity/'+ id);
+        return oGet('http://127.0.0.1:5000/api/u/activity/'+ id);
     },
     
     _post (params) {
-        return oPost('http://47.111.234.116:8080/api/u/activity',params);
+        return oPost('http://127.0.0.1:5000/api/u/activity',params);
     },
     
     _update (id, param) {
-        return oUpdate('http://47.111.234.116:8080/api/u/activity/state/'+ id, param);
+        return oUpdate('http://127.0.0.1:5000/api/u/activity/state/'+ id, param);
     },
 
     _remove(coursename,memberid){      
-        return oRemove('http://47.111.234.116:8080/api/u/activity/'+ coursename+'/'+memberid);
+        return oRemove('http://127.0.0.1:5000/api/u/activity/'+ coursename+'/'+memberid);
         
     },
 
