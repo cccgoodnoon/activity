@@ -162,6 +162,7 @@
                 timeValue: '',
                 course_uuid:'',
                 course_credit:'',
+                uuid:'',
                 member_uuid:'',
                 selected: [],
                 courseSelected: [],
@@ -222,15 +223,17 @@
                     this.$refs.activityTable.toggleRowSelection(array,true);
                     this.actiSelected=array;
                     console.log(array);
-                    // this.uuid
-                    
                     // document.getElementById("teacher").innerHTML=array.firstname; 
                 } 
                 if (val.length == 1) {
                     this.$refs.activityTable.toggleRowSelection(val,false);
                     this.actiSelected=val;
                     this.course_name = val[0].name;
-                    console.log(val);    
+                    console.log(val);
+                    // this.state = val[0].objectstate;
+                    this.uuid = val[0].uuid;
+                    // console.log(this.uuid);
+                    console.log("复选框状态",this.state);
                 }
  
             },
@@ -291,14 +294,17 @@
                 })
             },
             handleActivity(row, event, column) {
-                // console.log("当前状态",this.activity[0].objectstate);
-                this.update = {'state':this.activity[0].objectstate}
-                // console.log(this.update);                
+                // console.log("该老师课程",this.activity);
+                // console.log("该行信息",row);
+                // console.log("该行id",row.id);
+                // console.log("该行点击时状态",row.objectstate);
+                this.state = row.objectstate
+                console.log(this.state);
+                this.update = {'state':row.objectstate}              
                 this.$refs.activityTable.toggleRowSelection(row)
-                // console.log("行id",row.id);
                 this.currentId = row.id;
                 this.dialogUpdateVisible = true
-                this.update.state = String(this.activity[0].objectstate)           
+                this.update.state = String(this.state)           
             },
             getMember(){
                 let self = this
@@ -320,7 +326,7 @@
             getActivity(id){
                 let self = this
                 api._getA(this.member_uuid).then(res =>{
-                    console.log(res);
+                    // console.log(res);
                     self.activity = res;
                 },err => {
                     console.log(err);
@@ -355,13 +361,20 @@
             removeActivity(){
                 // console.log(this.course_name);
                 // console.log(this.member_uuid);
+                console.log(this.uuid);
                 this.$confirm('此操作将删除该老师的 ' + this.actiSelected.length + ' 门课程, 是否继续?','提示', {
                   type: 'warning'
                 }).then(() => {
-                    api._remove(this.course_name,this.member_uuid).then(res => {
+                    // api._remove(this.course_name,this.member_uuid).then(res => {
+                    //     this.$message.success('成功删除了课程!');
+                    //     // this.getMember();
+                    //     // this.getCourse();
+                    //     this.getActivity();
+                    // }).catch((res) => {
+                    //     this.$message.error('删除失败!');
+                    // });
+                    api._remove(this.uuid).then(res => {
                         this.$message.success('成功删除了课程!');
-                        // this.getMember();
-                        // this.getCourse();
                         this.getActivity();
                     }).catch((res) => {
                         this.$message.error('删除失败!');
@@ -415,32 +428,26 @@ ul li{list-style: none}
 .fl{float:left;}
 .fr{float:right;margin: 10px 120px 0px 5px;display:block;}
 h1{text-align: center; margin-bottom: 0px;color: #112d4e;letter-spacing:5px;}
-/* //滚动条的宽度 */
 ::-webkit-scrollbar {
   width: 9px;
   height: 10px;
 }
-/* //滚动条的滑块 */
 ::-webkit-scrollbar-thumb {
   background-color: #d6e4f0;
   border-radius: 3px;
 }
 .el-table{
-/* 表格字体颜色 */
 color:black;
-/* 表格边框颜色 */
 border: 1px solid #d6e4f0;
 height: 500px;
 }
-/* 用来设置当前页面element全局table 选中某行时的背景色*/
 .el-table__body tr.current-row>td{
   background-color: #d6e6f2 !important;
-  color: #537791;  /* 设置文字颜色，可以选择不设置 */
+  color: #537791;  
 }
-/* 用来设置当前页面element全局table 鼠标移入某行时的背景色*/
 .el-table--enable-row-hover .el-table__body tr:hover>td {
   background-color: #d6e6f2;
-  color: #537791; /* 设置文字颜色，可以选择不设置 */
+  color: #537791; 
 }
 
 </style>
